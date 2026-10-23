@@ -4,7 +4,9 @@ function login(){return hdr('تسجيل دخول المحطات','home')+`<main>
 async function doLogin(){if(!need())return;const u=$('#lu').value.trim().toLowerCase(),p=$('#lp').value;if(!u||!p)return toast('بيانات الدخول غير صحيحة');
 const lk=await sb.rpc('login_locked',{p_username:u});if(lk.data===true){$('#lk').style.display='block';return toast('الحساب موقوف، استخدم الكود')}
 const r=await sb.auth.signInWithPassword({email:EM(u),password:p});
-if(r.error){const n=await sb.rpc('login_failed',{p_username:u}),c=n.data||0;if(c>=5)$('#lk').style.display='block';return toast(c>=5?'تم إيقاف الحساب':c?`كلمة مرور خاطئة (${c}/5)`:'بيانات الدخول غير صحيحة')}
+if(r.error){const m=String(r.error.message||''),cd=r.error.code||'';
+if(!(/invalid login credentials/i.test(m)||cd==='invalid_credentials')){console.error('login',r.error);return toast(cd==='email_not_confirmed'?'الحساب غير مؤكد في Supabase (فعّل تأكيد المستخدم)':/api key|apikey|jwt/i.test(m)?'مفتاح الربط غير صحيح، راجع ملف config.js':(cd==='over_request_rate_limit'||r.error.status===429)?'محاولات كثيرة، انتظر بضع دقائق':'تعذر تسجيل الدخول ('+(cd||m||r.error.status)+')')}
+const n=await sb.rpc('login_failed',{p_username:u}),c=n.data||0;if(c>=5)$('#lk').style.display='block';return toast(c>=5?'تم إيقاف الحساب':c?`كلمة مرور خاطئة (${c}/5)`:'بيانات الدخول غير صحيحة')}
 await sb.rpc('login_ok');if(!await restore(r.data.user.id))return toast('بيانات الدخول غير صحيحة');
 if(S.u.admin){await pullOwners();return go('admin')}if(S.u.must)return reset();go('owner')}
 function reset(){$('#app').innerHTML=hdr('تعيين كلمة مرور جديدة','home')+`<main><div class="card"><p>لأمانك، يرجى تعيين كلمة مرور جديدة قبل المتابعة.</p><input id="np" type="password" placeholder="كلمة المرور الجديدة (6 أحرف على الأقل)"><button class="btn" onclick="setPw()">حفظ ومتابعة</button></div></main>`}
