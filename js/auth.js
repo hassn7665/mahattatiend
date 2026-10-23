@@ -20,7 +20,7 @@ async function addSt(){if(!need())return;const n=val('an'),u=val('au').toLowerCa
 if(!n||!/^[a-z0-9_.]{3,30}$/.test(u)||p.length<6)return toast('أكمل الحقول (اسم المستخدم بالإنجليزية، وكلمة المرور 6 أحرف+)');if(m&&!lnk(m))return toast('الرابط غير صالح، يجب أن يبدأ بـ https');
 const c=ll(m),st=await sb.from('stations').insert({name:n,governorate:val('ag'),area:val('aa'),address:val('ad'),map_url:m||null,lat:c.lat,lng:c.lng}).select().single();if(st.error)return toast('حدث خطأ، حاول مجدداً');
 const su=await sb.rpc('admin_create_owner',{p_username:u,p_password:p,p_station:st.data.id});
-if(su.error){await sb.from('stations').delete().eq('id',st.data.id);console.error('create owner',su.error);return toast(/مستخدم|duplicate|already/i.test(su.error.message||'')?'اسم المستخدم مستخدم':'حدث خطأ، حاول مجدداً ('+(su.error.code||su.error.message||'')+')')}
+if(su.error){await sb.from('stations').delete().eq('id',st.data.id);console.error('create owner',su.error);return toast(/مستخدم|duplicate|already/i.test(su.error.message||'')?'اسم المستخدم مستخدم':(su.error.code==='P0001'?String(su.error.message||''):'حدث خطأ، حاول مجدداً ('+(su.error.code||su.error.message||'')+')'))}
 await pull();toast('تم الإنشاء')}
 async function gen(id){if(!need())return;const o=DB.owners.find(x=>x.id===id),r=await sb.rpc('admin_make_code',{p_username:o.user});if(r.error)return toast('حدث خطأ، حاول مجدداً');await pullOwners();render()}
 async function delO(id){if(!confirm(T('حذف الحساب؟')))return;if(!need())return;const r=await sb.rpc('admin_delete_owner',{p_id:id});if(r.error)return toast('حدث خطأ، حاول مجدداً');await pullOwners();render()}
