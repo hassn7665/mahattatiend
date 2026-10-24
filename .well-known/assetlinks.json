@@ -2,8 +2,7 @@
       "relation": ["delegate_permission/common.handle_all_urls"],
       "target": {
         "namespace": "android_app",
-        "package_name": "com.mahattati.app",
+        "package_name": "io.github.hassn7665.twa",
         "sha256_cert_fingerprints": ["43:78:DC:8B:3C:50:EB:4B:A2:E9:95:53:2B:B4:EF:5C:61:E8:A4:6A:4B:21:3A:5B:C2:01:C6:58:7B:8B:B3:F2"]
       }
     }]
-
